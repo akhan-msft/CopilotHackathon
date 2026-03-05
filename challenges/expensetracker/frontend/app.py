@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import requests
 import pandas as pd
@@ -5,7 +6,7 @@ from datetime import date
 import plotly.express as px
 import plotly.graph_objects as go
 
-BACKEND_URL = "http://localhost:5000"
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:5000")
 
 st.set_page_config(page_title="Expense Tracker", page_icon="💰", layout="wide")
 st.title("💰 Expense Tracker")
