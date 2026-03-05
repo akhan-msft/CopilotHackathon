@@ -25,7 +25,7 @@ def get_expenses():
         response = requests.get(f"{BACKEND_URL}/expenses", timeout=5)
         return response.json()
     except Exception:
-        st.error("⚠️ Could not connect to backend. Make sure Flask is running on port 5000.")
+        st.error(f"⚠️ Could not connect to backend at {BACKEND_URL}. Make sure the Flask server is running.")
         return []
 
 
