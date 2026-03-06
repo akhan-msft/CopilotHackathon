@@ -1,4 +1,3 @@
-
 # Logs
 logs
 *.log
@@ -569,4 +568,6 @@ FodyWeavers.xsd
 *.app
 
 build
+
+.venv
 
