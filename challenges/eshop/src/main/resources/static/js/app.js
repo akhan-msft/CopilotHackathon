@@ -59,8 +59,8 @@ $(function () {
 
     /* ── Reset ── */
     $('#reset-btn').on('click', function () {
-        state.search = '';
-        state.page = 0;
+        state.search   = '';
+        state.page     = 0;
         state.minPrice = 0;
         state.maxPrice = 250;
         $('#search-input').val('');
@@ -72,8 +72,8 @@ $(function () {
     /* ── Load products ── */
     function loadProducts() {
         var params = {
-            page: state.page,
-            limit: state.limit,
+            page:     state.page,
+            limit:    state.limit,
             minPrice: state.minPrice,
             maxPrice: state.maxPrice
         };
@@ -83,42 +83,55 @@ $(function () {
             renderGrid(resp.data);
             renderPagination(resp.total, resp.totalPages);
         }).fail(function () {
-            $('#product-grid').html('<p style="color:red">Failed to load products. Is the server running?</p>');
+            $('#product-grid').html(
+                '<div class="col-12"><div class="alert alert-danger m-2">' +
+                'Failed to load products. Is the server running?</div></div>'
+            );
         });
     }
 
     /* ── Render grid ── */
     function renderGrid(parts) {
-        var $grid = $('#product-grid').empty();
+        var $grid      = $('#product-grid').empty();
         var $noResults = $('#no-results');
 
         if (!parts || parts.length === 0) {
-            $noResults.show();
+            $noResults.removeClass('d-none');
             return;
         }
-        $noResults.hide();
+        $noResults.addClass('d-none');
 
         $.each(parts, function (i, part) {
-            var imgSrc = part.image_url || ('https://placehold.co/400x200/e0e0e0/555?text=' + encodeURIComponent(part.name));
+            var iconClass = PartImages.getIcon(part);
+            var bgStyle   = PartImages.getBg(part);
+            var safeName = $('<span>').text(part.name).html();
+            var safeMfg  = $('<span>').text(part.manufacturer).html();
+            var safeDesc = $('<span>').text(part.description).html();
+
+            var $col  = $('<div class="col"></div>');
             var $card = $(
-                '<div class="product-card">' +
-                    '<img src="' + imgSrc + '" alt="' + $('<span>').text(part.name).html() + '" onerror="this.src=\'https://placehold.co/400x200/e0e0e0/555?text=No+Image\'"/>'+
-                    '<div class="card-body">' +
-                        '<p class="card-title">' + $('<span>').text(part.name).html() + '</p>' +
-                        '<p class="card-mfg">' + $('<span>').text(part.manufacturer).html() + '</p>' +
-                        '<p class="card-desc">' + $('<span>').text(part.description).html() + '</p>' +
-                        '<p class="card-price">$' + part.price.toFixed(2) + '</p>' +
+                '<div class="card h-100 product-card">' +
+                    '<div class="card-img-top d-flex align-items-center justify-content-center" style="background:' + bgStyle + '">' +
+                        '<i class="' + iconClass + ' text-white" style="font-size:3rem;opacity:.85"></i>' +
                     '</div>' +
-                    '<div class="card-footer">' +
-                        '<button class="btn-add-cart">Add to Cart</button>' +
-                        '<span class="stock-label">Stock: ' + part.stock + '</span>' +
+                    '<div class="card-body pb-2">' +
+                        '<h6 class="card-title fw-bold mb-1">' + safeName + '</h6>' +
+                        '<p class="small text-muted mb-1">' + safeMfg + '</p>' +
+                        '<p class="small text-secondary desc-clamp mb-2">' + safeDesc + '</p>' +
+                        '<p class="fw-bold text-danger mb-0 fs-5">$' + part.price.toFixed(2) + '</p>' +
+                    '</div>' +
+                    '<div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center py-2">' +
+                        '<button class="btn btn-sm btn-dark btn-add-cart">' +
+                            '<i class="bi bi-cart-plus me-1"></i>Add to Cart' +
+                        '</button>' +
+                        '<span class="badge bg-secondary">Stock: ' + part.stock + '</span>' +
                     '</div>' +
                 '</div>'
             );
 
-            /* Navigate to detail page on card click (not button) */
+            /* Navigate to detail page on card click (not on the Add to Cart button) */
             $card.on('click', function (e) {
-                if (!$(e.target).hasClass('btn-add-cart')) {
+                if (!$(e.target).closest('.btn-add-cart').length) {
                     window.location.href = 'product.html?id=' + part.id;
                 }
             });
@@ -130,41 +143,72 @@ $(function () {
                 showToast('"' + part.name + '" added to cart!');
             });
 
-            $grid.append($card);
+            $col.append($card);
+            $grid.append($col);
         });
     }
 
     /* ── Pagination ── */
     function renderPagination(total, totalPages) {
-        var $pag = $('#pagination').empty();
-        if (totalPages <= 1) return;
+        var $ul  = $('#pagination').empty();
+        var $nav = $('#pagination-nav');
 
-        var $prev = $('<button>‹ Prev</button>').prop('disabled', state.page === 0);
-        $prev.on('click', function () { state.page--; loadProducts(); });
-        $pag.append($prev);
+        if (totalPages <= 1) { $nav.addClass('d-none'); return; }
+        $nav.removeClass('d-none');
 
         var startPage = Math.max(0, state.page - 2);
         var endPage   = Math.min(totalPages - 1, state.page + 2);
 
+        var $prev = $(
+            '<li class="page-item' + (state.page === 0 ? ' disabled' : '') + '">' +
+                '<a class="page-link" href="#">‹ Prev</a>' +
+            '</li>'
+        );
+        $prev.on('click', function (e) {
+            e.preventDefault();
+            if (state.page > 0) { state.page--; loadProducts(); }
+        });
+        $ul.append($prev);
+
         for (var p = startPage; p <= endPage; p++) {
             (function (pg) {
-                var $btn = $('<button>' + (pg + 1) + '</button>');
-                if (pg === state.page) $btn.addClass('active');
-                $btn.on('click', function () { state.page = pg; loadProducts(); });
-                $pag.append($btn);
+                var $li = $(
+                    '<li class="page-item' + (pg === state.page ? ' active' : '') + '">' +
+                        '<a class="page-link" href="#">' + (pg + 1) + '</a>' +
+                    '</li>'
+                );
+                $li.on('click', function (e) { e.preventDefault(); state.page = pg; loadProducts(); });
+                $ul.append($li);
             }(p));
         }
 
-        var $next = $('<button>Next ›</button>').prop('disabled', state.page >= totalPages - 1);
-        $next.on('click', function () { state.page++; loadProducts(); });
-        $pag.append($next);
+        var $next = $(
+            '<li class="page-item' + (state.page >= totalPages - 1 ? ' disabled' : '') + '">' +
+                '<a class="page-link" href="#">Next ›</a>' +
+            '</li>'
+        );
+        $next.on('click', function (e) {
+            e.preventDefault();
+            if (state.page < totalPages - 1) { state.page++; loadProducts(); }
+        });
+        $ul.append($next);
     }
 
-    /* ── Simple toast notification ── */
+    /* ── Bootstrap toast notification ── */
     function showToast(msg) {
-        var $toast = $('<div style="position:fixed;bottom:20px;right:20px;background:#1a1a2e;color:#fff;padding:10px 18px;border-radius:6px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.3);">' + msg + '</div>');
-        $('body').append($toast);
-        setTimeout(function () { $toast.fadeOut(400, function () { $(this).remove(); }); }, 2500);
+        var $t = $(
+            '<div class="toast align-items-center text-white bg-dark border-0 ' +
+            'position-fixed bottom-0 end-0 m-3 show" role="alert" ' +
+            'style="z-index:9999;min-width:240px">' +
+                '<div class="d-flex">' +
+                    '<div class="toast-body">' + msg + '</div>' +
+                    '<button type="button" class="btn-close btn-close-white me-2 m-auto"' +
+                    ' data-bs-dismiss="toast"></button>' +
+                '</div>' +
+            '</div>'
+        );
+        $('body').append($t);
+        setTimeout(function () { $t.fadeOut(400, function () { $(this).remove(); }); }, 2500);
     }
 
     /* ── Initial load ── */

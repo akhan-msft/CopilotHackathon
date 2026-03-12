@@ -4,49 +4,89 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>AutoParts eShop</title>
-
-    <!-- jQuery UI theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css"/>
     <link rel="stylesheet" href="css/style.css"/>
 </head>
-<body>
+<body class="bg-light">
 
-<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
-<div id="header">
-    <h1>Auto<span>Parts</span> eShop</h1>
-    <button id="cart-btn">🛒 Cart <span id="cart-count">0</span></button>
-</div>
+<!-- ══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<nav class="navbar navbar-dark bg-dark sticky-top shadow-sm">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-bold" href="index.html">Auto<span class="text-danger">Parts</span> eShop</a>
+        <button class="btn btn-danger" id="cart-btn" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+            <i class="bi bi-cart3 me-1"></i>Cart
+            <span class="badge rounded-pill bg-white text-danger ms-1" id="cart-count">0</span>
+        </button>
+    </div>
+</nav>
 
-<!-- ═══════════════════════════ CONTROLS ════════════════════════ -->
-<div id="controls">
-    <input type="text" id="search-input" placeholder="Search by name, manufacturer, description…"/>
-    <button id="search-btn">Search</button>
-    <button id="reset-btn">Reset</button>
-
-    <div id="price-filter-wrap">
-        <span>Price:</span>
-        <div id="price-slider"></div>
-        <span id="price-range-label">$0 – $250</span>
+<!-- ══════════════════════════ SEARCH BAR ═══════════════════════════════ -->
+<div class="bg-white border-bottom shadow-sm py-3 px-4">
+    <div class="d-flex flex-wrap gap-3 align-items-center">
+        <div class="input-group flex-grow-0" style="max-width:360px">
+            <input type="text" class="form-control" id="search-input"
+                   placeholder="Search by name, brand, description…"/>
+            <button class="btn btn-dark" id="search-btn" type="button">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+        <button class="btn btn-outline-secondary" id="reset-btn" type="button">
+            <i class="bi bi-x-circle me-1"></i>Reset
+        </button>
+        <div class="d-flex align-items-center gap-2" style="min-width:260px;max-width:380px;flex:1">
+            <span class="text-muted small text-nowrap">Price:</span>
+            <div id="price-slider" style="flex:1"></div>
+            <span id="price-range-label" class="text-muted small text-nowrap">$0 – $250</span>
+        </div>
     </div>
 </div>
 
-<!-- ═══════════════════════════ MAIN ════════════════════════════ -->
-<div id="main">
-    <div id="product-grid"></div>
-    <div id="no-results">No products match your search.</div>
-    <div id="pagination"></div>
+<!-- ════════════════════════ PRODUCT GRID ═══════════════════════════════ -->
+<div class="container-fluid py-4 px-4">
+    <div id="product-grid" class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4"></div>
+    <div id="no-results" class="text-center text-muted py-5 d-none">
+        <i class="bi bi-search fs-1 d-block mb-3 opacity-25"></i>
+        No products match your search.
+    </div>
+    <nav id="pagination-nav" class="mt-4 d-none">
+        <ul id="pagination" class="pagination justify-content-center mb-0"></ul>
+    </nav>
 </div>
 
-<!-- ═══════════════════════════ CART DIALOG ══════════════════════ -->
-<div id="cart-dialog" title="🛒 Shopping Cart" style="display:none;">
-    <div id="cart-items-list"></div>
-    <div id="cart-empty-msg" style="display:none;">Your cart is empty.</div>
-    <div id="cart-total"></div>
+<!-- ════════════════════════ CART OFFCANVAS ══════════════════════════════ -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas"
+     aria-labelledby="cartOffcanvasLabel" style="width:380px">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title" id="cartOffcanvasLabel">
+            <i class="bi bi-cart3 me-2"></i>Shopping Cart
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column p-0">
+        <div id="cart-items-list" class="flex-grow-1 overflow-auto p-3"></div>
+        <div id="cart-empty-msg"
+             class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted d-none">
+            <i class="bi bi-cart-x fs-1 mb-2 opacity-25"></i>
+            Your cart is empty.
+        </div>
+        <div class="border-top p-3">
+            <div id="cart-total" class="d-none fw-bold fs-5 text-end mb-3"></div>
+            <button class="btn btn-outline-danger w-100 btn-sm d-none" id="clear-cart-btn" type="button">
+                <i class="bi bi-trash me-1"></i>Clear Cart
+            </button>
+        </div>
+    </div>
 </div>
 
-<!-- ═══════════════════════════ SCRIPTS ═════════════════════════ -->
+<!-- ══════════════════════════ SCRIPTS ══════════════════════════════════ -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/product-images.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/app.js"></script>
 </body>

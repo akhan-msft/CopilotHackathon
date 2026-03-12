@@ -1,0 +1,23 @@
+# User Prompts — eShop Challenge
+
+Chronological list of prompts used to go from the base Spring Boot eShop to a fully modernised Bootstrap 5 product catalogue.
+
+---
+
+1. **Add product images**
+   > "Can you add product images to the eShop so each auto part has a representative illustration?"
+
+2. **Bootstrap 5 modernisation**
+   > "Can you modernise the UI using Bootstrap 5? I want a cleaner, more professional look."
+
+3. **Fix card layout (thin slivers)**
+   > "The cards are rendering as thin slivers — the layout is broken."
+
+4. **Replace oversized SVGs with representative icons**
+   > "The image size is too big and not representative of the product — what are my options?"
+
+5. **Choose Font Awesome (Option 2)**
+   > "I would use option 2, we need images that are representative."
+
+6. **This file**
+   > "Can you do a user-prompts.txt in chronological order and add it to the eshops root folder?"

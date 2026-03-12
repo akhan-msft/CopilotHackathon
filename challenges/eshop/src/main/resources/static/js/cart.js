@@ -1,7 +1,7 @@
 /**
  * cart.js – shared cart logic (localStorage-backed)
  * Provides: Cart.add, Cart.remove, Cart.items, Cart.total, Cart.count
- * Also wires the cart dialog and updates the header badge on every page.
+ * Cart panel uses Bootstrap Offcanvas (no jQuery UI dialog).
  */
 var Cart = (function () {
     var STORAGE_KEY = 'eshop_cart';
@@ -16,7 +16,7 @@ var Cart = (function () {
     }
 
     function add(part) {
-        var items = load();
+        var items    = load();
         var existing = null;
         for (var i = 0; i < items.length; i++) {
             if (items[i].id === part.id) { existing = items[i]; break; }
@@ -28,7 +28,6 @@ var Cart = (function () {
         }
         save(items);
         updateBadge();
-        $.ui.toast && $.ui.toast({ message: '"' + part.name + '" added to cart!' });
     }
 
     function remove(id) {
@@ -37,7 +36,7 @@ var Cart = (function () {
         updateBadge();
     }
 
-    function items() { return load(); }
+    function items()  { return load(); }
 
     function total() {
         return load().reduce(function (sum, i) { return sum + i.price * i.qty; }, 0);
@@ -51,29 +50,41 @@ var Cart = (function () {
         $('#cart-count').text(count());
     }
 
-    function renderDialog() {
+    function renderCart() {
         var cartItems = load();
-        var $list = $('#cart-items-list').empty();
-        var $empty = $('#cart-empty-msg');
-        var $totalEl = $('#cart-total');
+        var $list     = $('#cart-items-list').empty();
+        var $empty    = $('#cart-empty-msg');
+        var $totalEl  = $('#cart-total');
+        var $clearBtn = $('#clear-cart-btn');
 
         if (cartItems.length === 0) {
-            $empty.show();
-            $totalEl.hide();
+            $empty.removeClass('d-none');
+            $totalEl.addClass('d-none');
+            $clearBtn.addClass('d-none');
         } else {
-            $empty.hide();
-            $totalEl.show();
+            $empty.addClass('d-none');
+            $totalEl.removeClass('d-none');
+            $clearBtn.removeClass('d-none');
+
             $.each(cartItems, function (idx, item) {
-                var $row = $('<div class="cart-item"></div>');
-                $row.append('<span class="cart-item-name">' + $('<span>').text(item.name).html() + '</span>');
-                $row.append('<span class="cart-item-qty">x' + item.qty + '</span>');
-                $row.append('<span class="cart-item-price">$' + (item.price * item.qty).toFixed(2) + '</span>');
-                var $removeBtn = $('<button class="btn-remove" title="Remove">✕</button>');
+                var $row = $('<div class="d-flex align-items-center gap-3 py-2 border-bottom"></div>');
+                $row.append(
+                    '<div class="flex-grow-1">' +
+                        '<div class="fw-semibold small">' + $('<span>').text(item.name).html() + '</div>' +
+                        '<div class="text-muted small">qty ' + item.qty +
+                            ' &times; $' + item.price.toFixed(2) + '</div>' +
+                    '</div>'
+                );
+                $row.append(
+                    '<span class="fw-bold text-danger small">$' +
+                    (item.price * item.qty).toFixed(2) + '</span>'
+                );
+                var $removeBtn = $(
+                    '<button class="btn btn-sm btn-link text-muted p-0 ms-1" title="Remove">' +
+                    '<i class="bi bi-x-lg"></i></button>'
+                );
                 $removeBtn.on('click', (function (id) {
-                    return function () {
-                        remove(id);
-                        renderDialog();
-                    };
+                    return function () { remove(id); renderCart(); };
                 }(item.id)));
                 $row.append($removeBtn);
                 $list.append($row);
@@ -82,28 +93,21 @@ var Cart = (function () {
         }
     }
 
-    /* Wire cart button on DOM ready */
+    /* ── Wire up on DOM ready ── */
     $(function () {
         updateBadge();
 
-        /* Init jQuery UI dialog (hidden by default) */
-        $('#cart-dialog').dialog({
-            autoOpen: false,
-            modal: true,
-            width: 460,
-            buttons: {
-                'Clear Cart': function () {
-                    save([]);
-                    updateBadge();
-                    renderDialog();
-                },
-                'Close': function () { $(this).dialog('close'); }
-            }
-        });
+        /* Populate cart content when the offcanvas panel is opened */
+        var cartEl = document.getElementById('cartOffcanvas');
+        if (cartEl) {
+            cartEl.addEventListener('show.bs.offcanvas', renderCart);
+        }
 
-        $('#cart-btn').on('click', function () {
-            renderDialog();
-            $('#cart-dialog').dialog('open');
+        /* Clear cart button */
+        $('#clear-cart-btn').on('click', function () {
+            save([]);
+            updateBadge();
+            renderCart();
         });
     });
 

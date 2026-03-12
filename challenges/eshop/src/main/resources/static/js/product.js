@@ -19,13 +19,25 @@ $(function () {
     $.getJSON('/api/parts/' + partId, function (part) {
         document.title = part.name + ' – AutoParts eShop';
 
-        var imgSrc = part.image_url || ('https://placehold.co/400x300/e0e0e0/555?text=' + encodeURIComponent(part.name));
-        $('#detail-img').attr('src', imgSrc).attr('alt', part.name);
+        var iconClass = PartImages.getIcon(part);
+        var bgStyle = PartImages.getBg(part);
+        $('#detail-img').css('background', bgStyle);
+        $('#detail-icon').addClass(iconClass);
         $('#detail-name').text(part.name);
         $('#detail-mfg').text('Manufacturer: ' + part.manufacturer + '  |  Part #: ' + part.partNumber);
         $('#detail-desc').text(part.description);
         $('#detail-price').text('$' + part.price.toFixed(2));
-        $('#detail-stock-label').text(part.stock > 0 ? 'In stock (' + part.stock + ')' : 'Out of stock');
+        if (part.stock > 0) {
+            $('#detail-stock-label')
+                .text('In stock (' + part.stock + ')')
+                .removeClass('bg-danger bg-secondary')
+                .addClass('bg-success');
+        } else {
+            $('#detail-stock-label')
+                .text('Out of stock')
+                .removeClass('bg-success bg-secondary')
+                .addClass('bg-danger');
+        }
 
         /* Specifications table */
         var $table = $('#specs-table').empty();
@@ -48,7 +60,9 @@ $(function () {
         });
 
         if (part.stock === 0) {
-            $('#btn-add-detail').prop('disabled', true).css('opacity', '.5').text('Out of Stock');
+            $('#btn-add-detail').prop('disabled', true)
+                .addClass('opacity-50')
+                .html('<i class="bi bi-x-circle me-2"></i>Out of Stock');
         }
 
     }).fail(function () {
