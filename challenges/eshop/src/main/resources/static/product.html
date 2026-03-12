@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Part Details – AutoParts eShop</title>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css"/>
+    <link rel="stylesheet" href="css/product.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<div id="header">
+    <h1>Auto<span>Parts</span> eShop</h1>
+    <button id="cart-btn">🛒 Cart <span id="cart-count">0</span></button>
+</div>
+
+<a href="index.html" id="back-link">← Back to Products</a>
+
+<!-- ═══════════════════════════ DETAIL SECTION ═══════════════════ -->
+<div id="detail-wrap">
+    <img id="detail-img" src="" alt="Part image"/>
+    <div id="detail-info">
+        <h2 id="detail-name">Loading…</h2>
+        <p id="detail-mfg"></p>
+        <p id="detail-desc"></p>
+        <p id="detail-price"></p>
+
+        <div id="detail-specs">
+            <table id="specs-table"></table>
+        </div>
+
+        <p id="detail-compat"></p>
+
+        <button class="btn-add-cart-detail" id="btn-add-detail">Add to Cart</button>
+        <span id="detail-stock-label" style="margin-left:12px; font-size:.85rem; color:#888;"></span>
+    </div>
+</div>
+
+<!-- ═══════════════════════════ CART DIALOG ══════════════════════ -->
+<div id="cart-dialog" title="🛒 Shopping Cart" style="display:none;">
+    <div id="cart-items-list"></div>
+    <div id="cart-empty-msg" style="display:none;">Your cart is empty.</div>
+    <div id="cart-total"></div>
+</div>
+
+<!-- ═══════════════════════════ SCRIPTS ═════════════════════════ -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/product.js"></script>
+</body>
+</html>

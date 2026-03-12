@@ -1,7 +1,4 @@
-streamlit>=1.32.0
-requests>=2.31.0
-pandas>=2.0.0
-plotly>=5.18.0
+# No third-party dependencies needed – frontend is static HTML served by stdlib.
 
 # test dependencies
 pytest>=8.0.0

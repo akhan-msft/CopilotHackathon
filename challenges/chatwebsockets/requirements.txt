@@ -1,0 +1,6 @@
+flask
+flask-socketio
+requests
+pytest
+pytest-playwright
+pytest-bdd

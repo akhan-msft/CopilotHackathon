@@ -41,9 +41,9 @@ $backendJob = Start-Process -FilePath (Join-Path $backendVenv "Scripts\python.ex
 # Give the backend a moment to bind the port
 Start-Sleep -Seconds 2
 
-Write-Host "Starting frontend (Streamlit) on http://localhost:8501 ..." -ForegroundColor Green
-$frontendJob = Start-Process -FilePath (Join-Path $frontendVenv "Scripts\streamlit.exe") `
-    -ArgumentList "run", (Join-Path $frontendDir "app.py") `
+Write-Host "Starting frontend (static server) on http://localhost:8501 ..." -ForegroundColor Green
+$frontendJob = Start-Process -FilePath (Join-Path $frontendVenv "Scripts\python.exe") `
+    -ArgumentList (Join-Path $frontendDir "app.py") `
     -WorkingDirectory $frontendDir `
     -PassThru -NoNewWindow
 
